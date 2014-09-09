@@ -182,21 +182,6 @@ from
     ) as new_renewal_count on new_renewal_count.KALKULACJA_ID = k.ID
 	
 	outer apply (
-/*       select
-         case when @currency = 'EUR' then
-          (select top 1
-                 isnull( cast((rate_from.RATE/rate_from.AMOUNT) / (rate_to.RATE/rate_to.AMOUNT) as decimal(38,8)) ,
-                         0.0) --as day_rate
-          from DSA.DUR.PLIST_CURRENCY_RATE rate_from
-               join DSA.DUR.PLIST_CURRENCY_RATE rate_to on rate_from.DT = rate_to.DT and rate_from.CURRENCY_ID <> rate_to.CURRENCY_ID
-          where convert(varchar(8), rate_from.DT, 112) <= convert(varchar(8), k.DATA_WPR, 112)
-		        and rate_from.CURRENCY_ID = 'PLN' --@CurrFrom
-				and rate_to.CURRENCY_ID = 'EUR' --@CurrTo
-          order by rate_from.DT desc)
-          
-             else 1.0
-                     end as day_rate
-*/
 	-- convert currency using BCT com_exchange_rates dictionary
 	(select top 1
 		isnull(1/cast(
@@ -262,50 +247,15 @@ where
      )
 
 union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Internet', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Data', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Voice', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Other', 0,
-      null, null, null, null, null, null, null, null
-	  
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Colo', 0,
-      null, null, null, null, null, null, null, null
-    ) sq            
+  select 
+    0, 0, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, tmp.colo_label, 0, 
+    null, null, null, null, null, null, null, null
+  FROM (VALUES ('Internet'),('Data'),('Voice'),('Other'),('Colo')) as tmp(colo_label)
+) sq
 order by 
 	sq.CALC_NUMBER, 
 	CASE sq.LOB
