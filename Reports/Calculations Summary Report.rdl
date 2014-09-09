@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -4687,8 +4687,8 @@ select distinct
 	    case when k.COSTING_UPDATE = 'N' then 'No'
            when k.COSTING_UPDATE = 'Y' then 'Yes'
       end as COSTING_UPDATE,
-      case when k.FINAL_CU = 'N' then 'No'
-           when k.FINAL_CU = 'Y' then 'Yes'
+      case when k.FINAL_CU = 'Y' then 'Yes'
+	  else 'No' 
       end as FINAL_CU,
       k.STATUS_ID, s.OPIS as STATUS,
       k.NAZWA_KLIENTA as CUST_NAME,
