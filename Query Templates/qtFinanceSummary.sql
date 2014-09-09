@@ -3,9 +3,12 @@ select distinct
       k.ID,
       k.NR_KALKULACJI as CALC_NUMBER,
       k.WERSJA_KALKULACJI as VERSION,
-	  case when k.COSTING_UPDATE = 'N' then 'No'
+	    case when k.COSTING_UPDATE = 'N' then 'No'
            when k.COSTING_UPDATE = 'Y' then 'Yes'
       end as COSTING_UPDATE,
+      case when k.FINAL_CU = 'N' then 'No'
+           when k.FINAL_CU = 'Y' then 'Yes'
+      end as FINAL_CU,
       k.STATUS_ID, s.OPIS as STATUS,
       k.NAZWA_KLIENTA as CUST_NAME,
       k.NIP,
@@ -248,7 +251,7 @@ where
 
 union all
   select 
-    0, 0, null, null, null, null, null, null, null, null, 
+    0, 0, null, null, null, null, null, null, null, null, null,
     null, null, null, null, null, null, null, null, null, null, 
     null, null, null, null, null, null, null, null, null, null, 
     null, null, null, null, null, null, null, null, null, null, 

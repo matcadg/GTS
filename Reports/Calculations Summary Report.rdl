@@ -317,6 +317,10 @@
           <DataField>COSTING_UPDATE</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
+        <Field Name="FINAL_CU">
+          <DataField>FINAL_CU</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
       </Fields>
     </DataSet>
     <DataSet Name="status">
@@ -2211,14 +2215,14 @@ select s.ID, s.OPIS from DSA.PL_CBCT.STATUSY_KALKULACJI s</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox63">
+                        <Textbox Name="FINAL_CU">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
+                                  <Value>=Fields!FINAL_CU.Value</Value>
                                   <Style>
                                     <FontFamily>Tahoma</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -2230,7 +2234,7 @@ select s.ID, s.OPIS from DSA.PL_CBCT.STATUSY_KALKULACJI s</CommandText>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox63</rd:DefaultName>
+                          <rd:DefaultName>FINAL_CU</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -4680,9 +4684,12 @@ select distinct
       k.ID,
       k.NR_KALKULACJI as CALC_NUMBER,
       k.WERSJA_KALKULACJI as VERSION,
-	  case when k.COSTING_UPDATE = 'N' then 'No'
+	    case when k.COSTING_UPDATE = 'N' then 'No'
            when k.COSTING_UPDATE = 'Y' then 'Yes'
       end as COSTING_UPDATE,
+      case when k.FINAL_CU = 'N' then 'No'
+           when k.FINAL_CU = 'Y' then 'Yes'
+      end as FINAL_CU,
       k.STATUS_ID, s.OPIS as STATUS,
       k.NAZWA_KLIENTA as CUST_NAME,
       k.NIP,
@@ -4859,21 +4866,6 @@ from
     ) as new_renewal_count on new_renewal_count.KALKULACJA_ID = k.ID
 	
 	outer apply (
-/*       select
-         case when @currency = 'EUR' then
-          (select top 1
-                 isnull( cast((rate_from.RATE/rate_from.AMOUNT) / (rate_to.RATE/rate_to.AMOUNT) as decimal(38,8)) ,
-                         0.0) --as day_rate
-          from DSA.DUR.PLIST_CURRENCY_RATE rate_from
-               join DSA.DUR.PLIST_CURRENCY_RATE rate_to on rate_from.DT = rate_to.DT and rate_from.CURRENCY_ID &lt;&gt; rate_to.CURRENCY_ID
-          where convert(varchar(8), rate_from.DT, 112) &lt;= convert(varchar(8), k.DATA_WPR, 112)
-		        and rate_from.CURRENCY_ID = 'PLN' --@CurrFrom
-				and rate_to.CURRENCY_ID = 'EUR' --@CurrTo
-          order by rate_from.DT desc)
-          
-             else 1.0
-                     end as day_rate
-*/
 	-- convert currency using BCT com_exchange_rates dictionary
 	(select top 1
 		isnull(1/cast(
@@ -4939,50 +4931,15 @@ where
      )
 
 union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Internet', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Data', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Voice', 0,
-      null, null, null, null, null, null, null, null
-
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Other', 0,
-      null, null, null, null, null, null, null, null
-	  
-union all
-
-select 
-      0,0,null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-      null, null, null, null, null, null, null,
-	  'Colo', 0,
-      null, null, null, null, null, null, null, null
-    ) sq            
+  select 
+    0, 0, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, null, null, 
+    null, null, null, null, null, null, null, null, tmp.colo_label, 0, 
+    null, null, null, null, null, null, null, null
+  FROM (VALUES ('Internet'),('Data'),('Voice'),('Other'),('Colo')) as tmp(colo_label)
+) sq
 order by 
 	sq.CALC_NUMBER, 
 	CASE sq.LOB
