@@ -6,8 +6,8 @@ select distinct
 	    case when k.COSTING_UPDATE = 'N' then 'No'
            when k.COSTING_UPDATE = 'Y' then 'Yes'
       end as COSTING_UPDATE,
-      case when k.FINAL_CU = 'N' then 'No'
-           when k.FINAL_CU = 'Y' then 'Yes'
+      case when k.FINAL_CU = 'Y' then 'Yes'
+	  else 'No' 
       end as FINAL_CU,
       k.STATUS_ID, s.OPIS as STATUS,
       k.NAZWA_KLIENTA as CUST_NAME,
