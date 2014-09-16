@@ -1,0 +1,27 @@
+def services_voice = com_services_renewal_voice()
+def services = com_services_renewal_std() + com_services_renewal_pricelist()
+def rec_reve = 0
+
+for(k=0;k<services_voice.size();k++){
+    serv_list = services_voice[k]
+    for (l=0;l<serv_list.size();l++) {
+        if (serv_list[l].renewal) {
+            rec_reve += serv_list[l].result_minimal_price
+        }
+    }
+}
+
+for(k=0;k<services.size();k++){
+    serv_list = services[k]
+    for (l=0;l<serv_list.size();l++) {
+        if (serv_list[l].renewal) {
+            if (serv_list[l]._identifier_ == 'equipment') {
+                rec_reve += serv_list[l].result_reve
+            } else {
+                rec_reve += serv_list[l].user_price_result
+            }
+        }
+    }
+}
+
+return rec_reve
