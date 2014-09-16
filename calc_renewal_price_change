@@ -1,0 +1,64 @@
+def price_change = 0
+def services_voice = com_services_renewal_voice()
+def services = com_services_renewal_std() + com_services_renewal_pricelist()
+def services_all = services_voice + services
+
+def rec_reve = 0
+def rec_reve2 = 0
+def rec_prev = 0
+
+def count = 0;
+
+for(k=0;k<services_all.size();k++){
+    serv_list = services_all[k]
+    for (l=0;l<serv_list.size();l++) {
+        if (serv_list[l].renewal) {
+            def now_voice = false;
+            for(i=0;i<services_voice.size();i++){
+                def voice = services_voice[i]
+                for (j=0;j<voice.size();j++) {
+                    if (voice[j]._identifier_ == serv_list[l]._identifier_) {
+                        now_voice = true;
+                        break;
+                    }
+                }
+                if (now_voice) {
+                    break;
+                }
+            }
+            if (serv_list[l]._identifier_ == 'nonstd_calculation') {
+                if (serv_list[l].RNL_price_change_input != 0) {
+                    price_change += abs(serv_list[l].RNL_price_change_input) / 100
+                    count++
+                }
+            } else {
+                if (!now_voice) {
+                    if (serv_list[l]._identifier_ == 'equipment') {
+                        rec_reve2 = serv_list[l].result_reve
+                    } else {
+                        rec_reve2 = serv_list[l].user_price_result
+                    }
+                } else {
+                    if (!change_terms) {
+                       rec_reve = serv_list[l].user_price_result
+                    }
+                }
+                
+                if (change_terms) {
+                    rec_prev = serv_list[l].PT_recurring_reve_ui
+                } else {
+                    rec_prev = serv_list[l].RNL_prev_rev_ui
+                }
+                if (rec_prev > 0) {
+                    price_change += (rec_prev - rec_reve - rec_reve2) / rec_prev
+                    count ++;
+                }
+            }
+        }
+    }
+}
+if (count > 0) {
+    price_change = price_change / count
+}
+
+return price_change
