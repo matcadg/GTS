@@ -1,0 +1,64 @@
+def dict_name = (business_unit == 'IS' ? 'com_decision_loa_rnw_IS' : 'com_decision_loa_rnw')
+def loa1_name = (business_unit == 'IS' ? 'LoA1' : 'LoA2')
+
+def services_voice = com_services_renewal_voice()
+def services = com_services_renewal_std() + com_services_renewal_pricelist()
+def services_all = services_voice + services
+
+def dec = 0
+def months_between = 0
+
+if (costing_update) {
+    dec = 0
+}
+else {
+    def price_change = calc_renewal_price_change()
+    def rec_reve = calc_renewal_rec_reve()
+    months_between = calc_renewal_months_between()
+    //println 'months_between: '+months_between
+    def loa_columns = dictionary_columns(dict_name,'LoA')
+    def fin = '0'
+    for ( e in loa_columns ) {
+        if (e.indexOf('_') != -1) {
+            def mid = e.substring(e.indexOf('_')+1)
+            if (mid != 'INFTY') {
+              if (months_between <= to_int(mid) && (fin == 'INFTY' || (fin != 'INFTY' && to_int(fin) > to_int(mid)))) {
+                fin = mid
+              }
+            } else {
+               if (fin == '0') {
+                 fin = mid
+               }
+            }
+        }
+    }
+    //println 'fin: '+fin
+    //println 'price_change: '+price_change
+    def rnw_loa1 = dictionary(dict_name, 'business_case_level', 'LoA0_'+fin)
+    def rnw_loa2 = dictionary(dict_name, 'business_case_level', 'LoA1_'+fin)
+    def rnw_loa3 = dictionary(dict_name, 'business_case_level', 'LoA2_'+fin)
+    def rnw_loa4 = dictionary(dict_name, 'business_case_level', 'LoA3_'+fin)
+    
+    def rnw_limit = dictionary(dict_name, 'business_case_level', 'Limit')
+
+    if (rec_reve > rnw_limit || rnw_limit == 0) {
+        if (rnw_loa1 <= rnw_loa2 && price_change <= rnw_loa1) {
+            dec = dictionary('com_decision_parameters_decisions','LoA0', 'dec_code')
+        }else if (rnw_loa2 <= rnw_loa3 && price_change > rnw_loa1 && price_change <= rnw_loa2) {
+            dec = dictionary('com_decision_parameters_decisions',loa1_name, 'dec_code')
+        }else if (rnw_loa3 <= rnw_loa4 && price_change > rnw_loa2 && price_change <= rnw_loa3) {
+            dec = dictionary('com_decision_parameters_decisions','LoA2', 'dec_code')
+        }else if (price_change > rnw_loa3 && price_change <= rnw_loa4) {
+            dec = dictionary('com_decision_parameters_decisions','LoA3', 'dec_code')
+        }else {
+            dec = dictionary('com_decision_parameters_decisions','LoA4', 'dec_code')
+        }
+    }
+    
+    else {
+        dec = dictionary('com_decision_parameters_decisions','LoA0', 'dec_code')
+    }
+
+}
+
+return dec
