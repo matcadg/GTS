@@ -1,0 +1,7 @@
+def services = service_list('access')+service_list('subscript')+service_list('equipment')
+def reve = 0
+for (i = 0; i < services.size(); i++){
+    reve += services[i].result_reve
+}
+
+return reve
