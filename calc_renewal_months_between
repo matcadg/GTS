@@ -1,0 +1,27 @@
+def services_voice = com_services_renewal_voice()
+def services = com_services_renewal_std() + com_services_renewal_pricelist()
+def rec_reve = calc_renewal_price_change()
+def months_between = 0
+if(rec_reve>0){
+ for(k=0;k<services_voice.size();k++){
+    serv_list = services_voice[k]
+    for (l=0;l<serv_list.size();l++) {
+        if (serv_list[l].renewal && serv_list[l].PT_RNL_mnth_bn != null) {
+            months_between += serv_list[l].PT_RNL_mnth_bn * serv_list[l].result_minimal_price / rec_reve
+        }
+    }
+ }
+ for(k=0;k<services.size();k++){
+    serv_list = services[k]
+    for (l=0;l<serv_list.size();l++) {
+        if (serv_list[l].renewal && serv_list[l].PT_RNL_mnth_bn != null) {
+            if (serv_list[l]._identifier_ == 'equipment') {
+                months_between += serv_list[l].PT_RNL_mnth_bn * serv_list[l].result_reve / rec_reve
+            } else {
+                months_between += serv_list[l].PT_RNL_mnth_bn * serv_list[l].user_price_result / rec_reve
+            }
+        }
+    }
+ }
+}
+return Math.ceil(months_between)
