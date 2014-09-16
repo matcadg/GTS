@@ -1,0 +1,28 @@
+def services = com_services_voice_string()
+def rec_reve = 0
+
+def wasVoice = false
+
+if (renewal) {
+    for(k=0;k<services.size();k++){
+        if (service_identifier == services[k]){
+            rec_reve =  minimal_price()//result_user_price()
+            /*if (service_identifier == 'indirect_voice') {
+                rec_reve += access_reve()
+            }*/
+            wasVoice = true
+            break;
+        }
+    }
+    if (!wasVoice) {
+        if (service_identifier == 'equipment') {
+            rec_reve = recurring_revenue()
+        } else if (service_identifier == 'colo') {
+            rec_reve = result_user_price()
+        } else {
+            rec_reve = field_sgst_price('recurring')//result_user_price()
+        }
+    }
+}
+
+return rec_reve
