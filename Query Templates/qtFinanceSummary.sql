@@ -47,7 +47,7 @@ select distinct
 	  cast(isnull(wk.VDATA25, 0.0) as float) * rate.day_rate as RESULT_RPP_PB,
 	  cast(wk.NDATA18 as float) * rate.day_rate as RESULT_MBP,
 	  case 
-		when VDATA11 in ('-') then NULL
+		when VDATA11 in ('-') then 0.0
 		WHEN RIGHT(VDATA11, 1) = '%' then CAST(LEFT(VDATA11, len(VDATA11)-1) AS float) / 100
 		ELSE CAST(VDATA11 as float)
 		end as RESULT_MRC_DISCOUNT, -- cast(wk.VDATA11 as float) as RESULT_MRC_DISCOUNT,
