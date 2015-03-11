@@ -1,0 +1,50 @@
+def m = 1
+def year
+def total_price_erossion = 1
+
+def minimal_price = access_minimal_price()
+def packet_reve = 0 //monthly_reve_packet() CBCTPL-1140
+
+def traffic_monthly = monthly_traffic(mnth)
+def traffic_incoming = traffic_sub0.result_traffic_reve
+def credibility = dictionary('voice_main_factors', 'credibility_factor', 'value')
+def l_limit = dictionary('voice_main_factors', 'lenght_limit', 'mnth')
+
+mnth.times() {
+    if (m <= l_limit) {
+        year = get_year(m)
+        if (m > 1) {
+            total_price_erossion = total_price_erossion * ((1 - dictionary('com_erossion_price' , 'Voice' , year + '_year')/12))
+        }
+     }
+    m++
+}
+
+def variable = (traffic_monthly + traffic_incoming - minimal_price) * credibility * total_price_erossion
+
+if (variable >= 0) {
+    variable = variable
+}
+
+else {
+    variable = 0
+}
+
+def traffic
+
+if (mnth <= l_limit) {
+    traffic = minimal_price + packet_reve + variable
+   }
+   
+else {
+    traffic = minimal_price + packet_reve
+}
+
+if (traffic > 0) {
+    traffic = traffic
+}
+
+else {
+    traffic = 0
+}
+return traffic
